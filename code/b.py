@@ -22,6 +22,7 @@ def main_tcp():
 
 def main_udp():
     with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as s:
+        # s.bind(('localhost', 6666))
         s.sendto(b"from B", ("localhost", 7777))
         while True:
             data, addr = s.recvfrom(1024)

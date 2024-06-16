@@ -65,7 +65,18 @@ Which is matching III-E. Récapitulatif at https://broux.developpez.com/articles
 
 Note in `UDP` server has to do the `bind`.
 But client can also do it: https://stackoverflow.com/questions/41582107/can-i-bind-a-client-socket-to-an-ip-not-belongs-to-any-interfaces
+
+So in [b.py`main_udp`](./code/b.py) we can perform `s.bind(('localhost', 6666))` 
 It will just force a specific source IP in UDP datagram.
 
+If we do a packet capture with `sudo wireshark` on `lo1`, we will see source IP is `6666` whereas otherwise it is randomly chosen.
 
 As a conclusion there is no socket establishment direction in UDP unlike TCP.
+
+Note if `a (server)` is not doing the bind,  `b (client)`  can not know the port to target.
+When `b` is answering to `a`, it uses the source IP in `a` UDP datagram.
+
+In context of UDP we use client/server but there is not really strong client/server concept as in TCP.
+Since there is no difference between `a` and `b` in the end.
+
+
