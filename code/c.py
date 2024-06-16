@@ -19,7 +19,7 @@ def main_tcp():
                     s.sendall(b"live!")
                     time.sleep(1)
 
-def main():
+def main_udp():
     with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as s:
         s.sendto(b"from C", ("localhost", 7777))
         while True:
@@ -38,5 +38,5 @@ def main():
 
 if __name__ == "__main__":
     print("I am a client")
-    #main()
-    main_tcp()
+    main_udp()
+    #main_tcp()

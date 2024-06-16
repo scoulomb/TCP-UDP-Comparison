@@ -22,7 +22,7 @@ def main_tcp():
             conn, addr = s.accept()
             POOL.submit(handle_connection, conn)
 
-def main():
+def main_udp():
     with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as s:
         s.bind(('localhost', 7777))
         while True:
@@ -40,5 +40,5 @@ if __name__ == "__main__":
     global POOL
     POOL = ThreadPoolExecutor(max_workers=5)
 
-    # main()
-    main_tcp()
+    main_udp()
+    #main_tcp()
