@@ -80,3 +80,4 @@ In context of UDP we use client/server but there is not really strong client/ser
 Since there is no difference between `a` and `b` in the end.
 
 
+https://github.com/scoulomb/private_script/blob/main/Links-mig-auto-cloud/Additional-comments.md#socket-establishment-directrion-vs-message-flow-direction
