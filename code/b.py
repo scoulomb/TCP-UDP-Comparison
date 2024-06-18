@@ -5,6 +5,7 @@ import time
 
 def main_tcp():
     with (socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s):
+        s.bind(('localhost', 5555))
         s.connect(("localhost", 7777))
         s.sendall(b"from B")
         while True:

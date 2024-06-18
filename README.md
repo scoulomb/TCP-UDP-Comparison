@@ -64,20 +64,45 @@ Which is matching III-E. Récapitulatif at https://broux.developpez.com/articles
 ### Difference between UDP and TCP.
 
 Note in `UDP` server has to do the `bind`.
-But client can also do it: https://stackoverflow.com/questions/41582107/can-i-bind-a-client-socket-to-an-ip-not-belongs-to-any-interfaces
+But `UDP` client can also do it: https://stackoverflow.com/questions/41582107/can-i-bind-a-client-socket-to-an-ip-not-belongs-to-any-interfaces
 
 So in [b.py`main_udp`](./code/b.py) we can perform `s.bind(('localhost', 6666))` 
 It will just force a specific source IP in UDP datagram.
 
 If we do a packet capture with `sudo wireshark` on `lo1`, we will see source IP is `6666` whereas otherwise it is randomly chosen.
 
-As a conclusion there is no socket establishment direction in UDP unlike TCP.
+Obviously same is possible in `TCP` client.
+So in [b.py`main_tcp`](./code/b.py) we can perform `s.bind(('localhost', 5555))
+Also verified via Wireshark.
+ 
 
-Note if `a (server)` is not doing the bind,  `b (client)`  can not know the port to target.
-When `b` is answering to `a`, it uses the source IP in `a` UDP datagram.
+Note if `a (server)` is not doing the bind (UDP and TCP),  `b (client)`  can not know the port to target.
+When `a` is answering to `b`: (also visibe via Wireshark)
+````
+Wireshark pcap
 
-In context of UDP we use client/server but there is not really strong client/server concept as in TCP.
-Since there is no difference between `a` and `b` in the end.
+User Datagram Protocol, Src Port: 38121, Dst Port: 7777 (b->a)
+User Datagram Protocol, Src Port: 7777, Dst Port: 38121 (a->b)
+````
+- it uses the destination (IP, Port) in `b` UDP datagram source (IP,Port) 
+- it uses the source (IP, Port) in `a` UDP datagram destination (IP, Port) : the one we bind on server side
+
+Last one has an importance in restrcited cne NAT, Port restricted cone NAT and symetric NAT.
+
+See
+- http://wapiti.enic.fr/commun/ens/peda/options/ST/RIO/pub/exposes/exposesrio2005/cleret-vanwolleghem/nat.htm
+- https://github.com/scoulomb/home-assistant/blob/main/appendices/VPN-tailscale.md
 
 
+API is not consitent in TCP `recv` is done on `conn` object on server side, whereas done on socket in client side.
+
+
+Unlike in TCP, in context of UDP we use client/server but there is not really strong concept of client/server.
+UDP Server is usually doing the bind and client is sending the first message (server replies using  source (ip, port) in client packet), and we saw client can also do the bind. 
+
+**Therefore our  conclusion is that socket establishment direction is a `TCP` concept**
+
+[here]
+
+add link to raw socket
 https://github.com/scoulomb/private_script/blob/main/Links-mig-auto-cloud/Additional-comments.md#socket-establishment-directrion-vs-message-flow-direction
