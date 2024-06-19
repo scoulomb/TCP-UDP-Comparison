@@ -103,6 +103,7 @@ UDP Server is usually doing the bind and client is sending the first message (se
 **Therefore our  conclusion is that socket establishment direction is a `TCP` concept**
 
 [here]
+--
 
 add link to raw socket
 https://github.com/scoulomb/private_script/blob/main/Links-mig-auto-cloud/Additional-comments.md#socket-establishment-directrion-vs-message-flow-direction
