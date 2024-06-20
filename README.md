@@ -131,11 +131,10 @@ Usually message flow direction same as TCP socket establishment direction (for e
 Example when not in same direction is push notification: from mobile device perspective TCP socket establishment is outbound, message flow is inbound.
 
 
-This same mechanism (where socket establishment is outbound and message flow inbound for home user) is  heavily used by smarthome devices like Hue, Netatmo, Somfy Tahoma, Apple Home (to local HUE via HomeKit)
+This same mechanism (where socket establishment is outbound and message flow inbound for home user) is heavily used by smarthome devices like Hue, Netatmo, Somfy Tahoma, Apple Home (to local HUE via HomeKit)
 
 Instead of having a NAT rule to access internal API (or VPN): `Client->  IP public -> NAT -> Hue hub`
-https://github.com/scoulomb/myhaproxy/blob/main/README.md#we-have-seen-3-ways-to-access-internal-server-from-external (See also tailscale VPN which eanbales to traverse NAT without NAT rules: https://github.com/scoulomb/home-assistant/blob/main/appendices/VPN-tailscale.md)
-
+https://github.com/scoulomb/myhaproxy/blob/main/README.md#we-have-seen-3-ways-to-access-internal-server-from-external (See also tailscale VPN which enables to traverse NAT without NAT rules: https://github.com/scoulomb/home-assistant/blob/main/appendices/VPN-tailscale.md)
 
 
 What they are doing is : `Client -> HUE cloud <- Hub HUE` (arrow are socket establishment direction)
@@ -204,3 +203,8 @@ See https://github.com/scoulomb/home-assistant/blob/main/appendices/VPN.md#into 
 
 Referenced in /private_script/blob/main/Links-mig-auto-cloud/Additional-comments.md#socket-establishment-directrion-vs-message-flow-direction
 
+## Links with HTTP over socket
+
+https://github.com/scoulomb/http-over-socket/tree/main: where we had also implemented a HTTP client/server over TCP. 
+
+<!--quic udp etc -- skip -->
