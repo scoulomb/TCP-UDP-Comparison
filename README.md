@@ -63,31 +63,31 @@ Which is matching III-E. Récapitulatif at https://broux.developpez.com/articles
 
 ### Difference between UDP and TCP.
 
-Note in `UDP` server has to do the `bind`.
+Note in `UDP` server has still to do the `bind`.
 But `UDP` client can also do it: https://stackoverflow.com/questions/41582107/can-i-bind-a-client-socket-to-an-ip-not-belongs-to-any-interfaces
 
 So in [b.py`main_udp`](./code/b.py) we can perform `s.bind(('localhost', 6666))` 
 It will just force a specific source IP in UDP datagram.
+If we do a packet capture with `sudo wireshark` on `lo1`, with `s.bind(('localhost', 6666))`  on client, we will see source IP is `6666` whereas otherwise it is randomly chosen.
 
-If we do a packet capture with `sudo wireshark` on `lo1`, we will see source IP is `6666` whereas otherwise it is randomly chosen.
-
-Obviously same is possible in `TCP` client.
+Obviously `TCP` client can also do the `bind`.
 So in [b.py`main_tcp`](./code/b.py) we can perform `s.bind(('localhost', 5555))
-Also verified via Wireshark.
+Also verified same behavior via Wireshark.
  
 
-Note if `a (server)` is not doing the bind (UDP and TCP),  `b (client)`  can not know the port to target.
+Note if `a (server)` is not doing the bind (UDP and TCP),  `b (client)`  can not know which port to target.
 When `a` is answering to `b`: (also visibe via Wireshark)
+
 ````
 Wireshark pcap
 
-User Datagram Protocol, Src Port: 38121, Dst Port: 7777 (b->a)
+User Datagram Protocol, Src Port: 38121, Dst Port: 7777 (b->a) 
 User Datagram Protocol, Src Port: 7777, Dst Port: 38121 (a->b)
 ````
-- it uses the destination (IP, Port) in `b` UDP datagram source (IP,Port) 
-- it uses the source (IP, Port) in `a` UDP datagram destination (IP, Port) : the one we bind on server side
+- it uses as destination (IP, Port), the one in `b->a` UDP datagram source (IP,Port) 
+- it uses as source (IP, Port), the one in `b->a`  UDP datagram destination (IP, Port) : the one we bind on server side
 
-Last one has an importance in restrcited cne NAT, Port restricted cone NAT and symetric NAT.
+`b->a` source port has an importance in `Port Restricted Cone NAT`, and `symetric NAT`.
 
 See
 - http://wapiti.enic.fr/commun/ens/peda/options/ST/RIO/pub/exposes/exposesrio2005/cleret-vanwolleghem/nat.htm
@@ -97,13 +97,110 @@ See
 API is not consitent in TCP `recv` is done on `conn` object on server side, whereas done on socket in client side.
 
 
-Unlike in TCP, in context of UDP we use client/server but there is not really strong concept of client/server.
-UDP Server is usually doing the bind and client is sending the first message (server replies using  source (ip, port) in client packet), and we saw client can also do the bind. 
+Unlike in TCP, in context of UDP we use client/server terminology but there is not really strong concept of client/server, as there is no socket establishment direction as such.
+However, what we can see as "UDP Server", HAS TO do the bind and what we see as client HAS TO send first message (server replies using  destination (ip, port) in client source packet (and we saw client can also do the bind).
 
-**Therefore our  conclusion is that socket establishment direction is a `TCP` concept**
+**Therefore our  conclusion is that socket establishment direction is more a `TCP` concept**.
 
-[here]
---
 
-add link to raw socket
-https://github.com/scoulomb/private_script/blob/main/Links-mig-auto-cloud/Additional-comments.md#socket-establishment-directrion-vs-message-flow-direction
+## TCP Socket establishment direction 
+
+
+- TCP **Socket establishment direction** is inbound (and we are server) if on our end (1A, corpo) we do
+    - s.bind
+    - s.listen
+    - s.accept
+- else TCP socket easblishment is outbound (and we are client), on our end we do
+   - s.connect -- link to accept on TCP server
+
+
+- We can extend to UDP client/server where we consider server
+    - The part which HAS TO do the bind (as seen above both client/server can do it),
+-  and client
+    - Part sending first message 
+    
+
+- **Message flow direction is***
+    - outound for entity sending the query, and receiving the reply
+    - inbound for entity receiving the query, and sending the reply 
+
+Please note that  Message flow direction != TCP Socket establishment direction, see: /private_script/blob/main/Links-story-notes/socketEstablishmentDirection.md
+And as in this example message flow direction can be bi-directionnal. (Comment: For UDP, client still has to send first message)
+
+Usually message flow direction same as TCP socket establishment direction (for example we query an API). 
+Example when not in same direction is push notification: from mobile device perspective TCP socket establishment is outbound, message flow is inbound.
+
+
+This same mechanism (where socket establishment is outbound and message flow inbound for home user) is  heavily used by smarthome devices like Hue, Netatmo, Somfy Tahoma, Apple Home (to local HUE via HomeKit)
+
+Instead of having a NAT rule to access internal API (or VPN): `Client->  IP public -> NAT -> Hue hub`
+https://github.com/scoulomb/myhaproxy/blob/main/README.md#we-have-seen-3-ways-to-access-internal-server-from-external (See also tailscale VPN which eanbales to traverse NAT without NAT rules: https://github.com/scoulomb/home-assistant/blob/main/appendices/VPN-tailscale.md)
+
+
+
+What they are doing is : `Client -> HUE cloud <- Hub HUE` (arrow are socket establishment direction)
+
+
+````
+Hub HUE do outbound sokect establishment to HUE cloud (TCP socket permanent keep alive)
+If input 
+		HUEcloud.socket.send(toHubHue) 
+````
+
+Alternative is: connected devices (Hue, Netatmo...) can perform conitnous polling (CURL GET) to the server until ITO rather than keeping socket open. When server has data it sends the data. It means device is still opening the socket. This is what is also used by chat, they do a poll to central server to receive message. 
+(Except ms teams where robotic user where here server is pushing (it means teams server doing inbound socket establishment to chat client)) <!-- michel -->
+
+
+Or we do
+
+````
+HUBHue doing curl to HUECloud
+While True:
+	curl -X GET huecloud.com/events: return payload with list of actions
+
+````
+
+In the 2 alternative note we come back in a case where socket establishment direction == nessage flow, and device at home doing outbound socket establishment
+
+
+- Also not for Internet provider only **packet direction** is counting in their upload speed:
+    - Upload speed (debit montant): uplaod a file, download a file in a Natted server at home: https://github.com/scoulomb/home-assistant/blob/main/sound-video/setup-your-own-media-server-and-music-player/README.md (
+    - Downlaod speed (debit descendant): dowanload a file on internet, what a netflix move
+- ADSL optimizes the download speed thus asymetric and slow Jellyin donwload speed (from mobile client perspective)
+
+
+<!-- here -- all above is OK -->
+
+
+## Network devices and socket establishment
+
+
+In term of network setup usually
+- Outbound socket establishment entity usually exposes a SNAT facade (IP, Port) through SNAT policy on Firewall/Loadbalancer, and filter the traffic via filtering rules on firewall
+- Inbound socket establishment entity has Filtering rules on firewall accepting traffic from SNAT facade (IP) to destination (IP, Port). It listens traffic on destination (IP, Port). 
+    - Listen can be 
+        - on Firewall (requires a routing rules for router to FW, back to router then router to LB)
+        - or LoadBalancer (requires a DNAT from fw to LB)
+
+<!--
+- See link with 
+    - private_script/blob/main/Links-mig-auto-cloud/listing-use-cases/listing-use-cases.md#ip-used-in-outbound-only-socket-establishment-case-where-legacy-datacenter-f5-wasis-involved
+    - private_script/blob/main/Links-mig-auto-cloud/README.md#migration-and-snatdnat (Design v1/v2)
+-->
+
+When a packet is going out firewall accepts the response of packet coming back, see https://github.com/scoulomb/home-assistant/blob/main/appendices/VPN-tailscale.md 
+
+
+And this is used by:  https://github.com/scoulomb/home-assistant/blob/main/appendices/VPN-tailscale.md 
+
+
+## VPN IP as SNAT facade
+
+
+Also in corpo network, when no VPN is put in place between employee laptop and corporate network (vpn used connect to remote local network) for example a git server), we need to open firewall to have source IP of the employee allowed (inbound establishment to corpo). It can be the NAT IP of the box. VPN with static IP adress can help to always go out with same IP (VPN used for SNAT). Practical if client moving or using 4g device
+
+See https://github.com/scoulomb/home-assistant/blob/main/appendices/VPN.md#into (remote local nw and snat : Client -> VPN TUNNEL -> LAN -> SNAT ) See also link with https://github.com/scoulomb/home-assistant/blob/main/appendices/VPN.md#alternative
+
+
+Referenced in /private_script/blob/main/Links-mig-auto-cloud/Additional-comments.md#socket-establishment-directrion-vs-message-flow-direction
+
