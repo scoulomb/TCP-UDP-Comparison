@@ -106,11 +106,11 @@ However, what we can see as "UDP Server", HAS TO do the bind and what we see as 
 ## TCP Socket establishment direction 
 
 
-- TCP **Socket establishment direction** is inbound (and we are server) if on our end (1A, corpo) we do
+- TCP **Socket establishment direction** is inbound (and we are server) if on our end/entity (1A, corpo) we do
     - s.bind
     - s.listen
     - s.accept
-- else TCP socket easblishment is outbound (and we are client), on our end we do
+- else TCP socket easblishment is outbound (and we are client), on our end/entity we do
    - s.connect -- link to accept on TCP server
 
 
