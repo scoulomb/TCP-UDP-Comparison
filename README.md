@@ -214,13 +214,20 @@ And this is used by:  https://github.com/scoulomb/home-assistant/blob/main/appen
 
 ## VPN IP as SNAT facade
 
+See VPN usage here: https://github.com/scoulomb/home-assistant/blob/main/appendices/VPN.md#into. So here we are talking about interesting in Facade.
 
-Also in corpo network, when no VPN is put in place between employee laptop and corporate network (vpn used connect to remote local network) for example a git server), we need to open firewall to have source IP of the employee allowed (inbound establishment to corpo). It can be the NAT IP of the box. VPN with static IP adress can help to always go out with same IP (VPN used for SNAT). Practical if client moving or using 4g device
+- In corpo network, when no VPN is put in place between employee laptop and corporate network (vpn used connect to remote local network) for example a git server), we need to open firewall to have source IP of the employee allowed (inbound establishment to corpo). It can be the NAT IP of the box. VPN with static IP adress can help to always go out with same IP (VPN used for SNAT). Practical if client moving or using 4g device
 
-See https://github.com/scoulomb/home-assistant/blob/main/appendices/VPN.md#into (remote local nw and snat : Client -> VPN TUNNEL -> LAN -> SNAT ) See also link with https://github.com/scoulomb/home-assistant/blob/main/appendices/VPN.md#alternative
+See https://github.com/scoulomb/home-assistant/blob/main/appendices/VPN.md#into (remote local nw and snat : Client -> VPN TUNNEL -> LAN -> SNAT ) 
 
+<!-- Referenced in /private_script/blob/main/Links-mig-auto-cloud/Additional-comments.md#socket-establishment-directrion-vs-message-flow-direction -->
 
-Referenced in /private_script/blob/main/Links-mig-auto-cloud/Additional-comments.md#socket-establishment-directrion-vs-message-flow-direction
+- We could also use similar principle to to not have your public IP banned: https://github.com/scoulomb/home-assistant/blob/main/sound-video/setup-your-own-media-server-and-music-player/README.md#acquire-music as we could do via proton VPN
+
+- We can use QNAP VPN to allow al client to always go out via same IP
+- Tailscale allow this via exit nodes: https://tailscale.com/kb/1103/exit-nodes (otherwise overlay network which does not impact public internet traffic)
+- QNAP and tailscale described in https://github.com/scoulomb/home-assistant/blob/main/appendices/VPN.md are local VPN.
+
 
 ## Links with HTTP over socket
 
