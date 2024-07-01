@@ -98,7 +98,14 @@ API is not consitent in TCP `recv` is done on `conn` object on server side, wher
 
 
 Unlike in TCP, in context of UDP we use client/server terminology but there is not really strong concept of client/server, as there is no socket establishment direction as such.
-However, what we can see as "UDP Server", HAS TO do the bind and what we see as client HAS TO send first message (server replies using  destination (ip, port) in client source packet (and we saw client can also do the bind).
+However, what we can see as "UDP Server", HAS TO do the bind and what we see as b (server replies using  destination (ip, port) in client source packet (and we saw client can also do the bind).
+
+To be more exact <!-- comment JM and totally well integrated -->
+> C'est pas totalement vrai que le client doit envoyer le premier message.
+> Si le client et le server se sont mis d'accord en avance sur le port (ou il a ete decouvert par un autre moyen), alors le server ou le client peut commencer sans soucis.
+> Mais de maniere generale, c'est vrai que c'est plus courant que le client initie
+In that case what we see as "client" has to do the bind and it totally removes the concept of client/server in UDP! 
+
 
 **Therefore our  conclusion is that socket establishment direction is more a `TCP` concept**.
 
@@ -114,7 +121,7 @@ However, what we can see as "UDP Server", HAS TO do the bind and what we see as 
    - s.connect -- link to accept on TCP server
 
 
-- We can extend to UDP client/server where we consider server
+- We can extend to UDP client/server where we consider server (when port is not communicated via other mechanism)
     - The part which HAS TO do the bind (as seen above both client/server can do it),
 -  and client
     - Part sending first message 
@@ -163,9 +170,9 @@ In the 2 alternative note we come back in a case where socket establishment dire
 
 
 - Also not for Internet provider only **packet direction** is counting in their upload speed:
-    - Upload speed (debit montant): uplaod a file, download a file in a Natted server at home: https://github.com/scoulomb/home-assistant/blob/main/sound-video/setup-your-own-media-server-and-music-player/README.md (
+    - Upload speed (debit montant): uplaod a file, download a file in a Natted server at home: https://github.com/scoulomb/home-assistant/blob/main/sound-video/setup-your-own-media-server-and-music-player/README.md 
     - Downlaod speed (debit descendant): dowanload a file on internet, what a netflix move
-- ADSL optimizes the download speed thus asymetric and slow Jellyin donwload speed (from mobile client perspective)
+- ADSL optimizes the download speed thus asymetric and slow Jellyin donwload speed (from mobile client perspective, where socket establishment + message direction is inbound but big packt in reply are outbound)
 
 
 <!-- here -- all above is OK -->
