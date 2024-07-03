@@ -16,6 +16,8 @@ Toutes les requêtes d’un même couple « adresse port » interne sont mappés
 
 ![](./media/full_cone_nat.gif)
 
+Return packet is comaprable to DNAT.
+
 
 ### Restricted Cone NAT
 
