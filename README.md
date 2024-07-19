@@ -316,7 +316,7 @@ EA@@³a»Th°ºNëþ5
 (via Wireshark on mac arm)
 
 <!-- section socket programming and all above OK YES CCCL-->
-<!-- yes and recheck sequence OK -->
+<!-- yes and recheck sequence OK - recf OK -->
 
 ### Chapter 3.5.2: TCP segment structure
 
@@ -418,7 +418,12 @@ Figure 3.31 in book with telnet example OK and consistent above, we can generali
 - Packet n  : Seq=Y ACK=X+len(data (n-1)), data (n) , server -> client  (ACK and send data)
 - Packet n+1: Seq=ACK of n = X+len(data (n-1)), ACK=Y+ len(data (n)), client -> server (ACK only)
 
+Note when we say `Seq = ACK of n`
+    - for the value
+    - and meaning
+
 <!-- OK CCL STOP -- analysis OK STOP - FORBIDDEN TO RECHECK OK STOP!! section and above OK YES CCL CCL -->
+<!-- recheck OK and CCL OK-->
 
 ### Chapter 3.5.6 TCP connection management
 
@@ -433,7 +438,7 @@ It is interesting to see parallel with section [above](#chapter-352-tcp-segment-
 - Y=server_isn
 - All data are of size 1 (even if no data as SYN is a flag)
 
-<!-- OK I recheck full sequence, we are aligned and fully consistent, OK STOP -->
+<!-- OK I recheck full sequence, we are aligned and fully consistent, OK STOP - RECCL -->
 
 
 A TCP half open connection is a connection where last ACK is not received.
