@@ -473,9 +473,28 @@ And state machine describe for client in book is similar for server
 In Python example when closing a program we can see RST is sent.
 
 REST connection can interesting when switching traffic (before, and after) to avoid client to wait for timeout and reconnect immediatly.
+<!-- ref in private script technical-deepdive/Probing-and-bypass-9-Jul24.md  -->
 
-### BONUS on FIN/RST
+### FIN/RST in practise
 
-- Seems even when server `exit`, packet still sent on connection socket.
-- How to send a FIN/RST: https://stackoverflow.com/questions/409783/socket-shutdown-vs-socket-close 
+With our code if we do 
+- python3 a.py
+- Launch wireshark
+- python3 b.py
 
+We will see that even if server is doing a `exit(0)` (can ` random.Random().randint(0, 100) > 20:` on client to have it faster), packet are till sent because the socket is not closed (only the thread)
+So we receive alive from client and server sends ack. <!-- seems ok even if starts wireshark after server, stop -->
+
+I did not manage to close the socket (FIN) with conn.close() (which it what `__exit__` function of `with socket` does, and conn.shutdown(). 
+https://stackoverflow.com/questions/409783/socket-shutdown-vs-socket-close
+
+However If I close server terminal 
+
+I will have `BrokenPipeError: [Errno 32] Broken pipe` and we can see see reset in wireshark
+
+```
+77	24.316139	127.0.0.1	127.0.0.1	TCP	44	7777 → 5555 [RST, ACK] Seq=23 Ack=170 Win=408128 Len=0
+```
+
+<!-- BONUS CLEAR STOP HERE, could do tcpdump cli but  stop here
+also when kill server can reuse this term window for next client -->
