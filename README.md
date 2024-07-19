@@ -483,7 +483,7 @@ With our code if we do
 - python3 b.py
 
 We will see that even if server is doing a `exit(0)` (can ` random.Random().randint(0, 100) > 20:` on client to have it faster), packet are till sent because the socket is not closed (only the thread)
-So we receive alive from client and server sends ack. <!-- seems ok even if starts wireshark after server, stop -->
+So we receive alive from client and server sends ack. <!-- seems ok even if starts wireshark after client (b), believe it wa not the case, or random stop here -->
 
 I did not manage to close the socket (FIN) with conn.close() (which it what `__exit__` function of `with socket` does, and conn.shutdown(). 
 https://stackoverflow.com/questions/409783/socket-shutdown-vs-socket-close
